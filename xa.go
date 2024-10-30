@@ -1,7 +1,7 @@
 package xa
 
 import (
-	"flag"
+	"fmt"
 	"os"
 )
 
@@ -12,18 +12,22 @@ type runtime struct {
 }
 
 func (r *runtime) Excute() {
-	an := len(os.Args)
-	switch an {
-	case 0:
-	case 1:
-	}
+	fmt.Println(os.Args[0], os.Args[1])
+	r.ExcuteCommandName = os.Args[1]
 }
 
 var rt runtime
 
 func New() *app {
+	return &app{cmds: map[string]*Command{}}
+}
+
+func (a *app) Run() {
 	rt.Excute()
-	return &app{}
+	if cmd, ok := a.cmds[rt.ExcuteCommandName]; ok {
+		fmt.Println("988888-", cmd.call, cmd.desc, cmd.name, cmd.args)
+
+	}
 }
 
 func (a *app) Name(name string) *app {
@@ -48,7 +52,7 @@ func (a *app) Author(author string) *app {
 
 func (a *app) Load(cmd, desc string) *Command {
 	c := Command{name: cmd, desc: desc}
-	a.cmds = append(a.cmds, c)
+	a.cmds[cmd] = &c
 	return &c
 }
 
@@ -57,7 +61,7 @@ type app struct {
 	desc    string
 	author  string
 	version string
-	cmds    []Command
+	cmds    map[string]*Command
 }
 
 type Command struct {
@@ -81,6 +85,12 @@ func (c *Command) Args(key, desc string) *Command {
 	c.args = append(c.args, Args{name: key, desc: desc})
 	return c
 }
+func (c *Command) Call(fn func(*Command)) *Command {
+	fmt.Println("call1:", c)
+	c.call = fn
+	fmt.Println("call2:", c)
+	return c
+}
 
 func (c *Command) GetName() string {
 	return c.name
@@ -98,15 +108,6 @@ func (c *Command) GetArgs() []Args {
 	return c.args
 }
 
-func (c *Command) Call(fn func(*Command)) {
-	c.call = fn
-	if c.name == rt.ExcuteCommandName {
-		c.call(c)
-	}
-}
-
 func (c *Command) Get(name string) string {
-	s := flag.String("p", "111", "")
-	flag.Parse()
-	return *s
+	return "a"
 }
