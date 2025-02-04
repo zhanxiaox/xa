@@ -4,7 +4,7 @@ type Command struct {
 	name string
 	desc string
 	args []Args
-	call func(*Runtime)
+	call func(*App)
 }
 
 type Args struct {
@@ -21,7 +21,7 @@ func (c *Command) Args(key, desc string) *Command {
 	c.args = append(c.args, Args{name: key, desc: desc})
 	return c
 }
-func (c *Command) Call(fn func(*Runtime)) *Command {
+func (c *Command) Call(fn func(*App)) *Command {
 	c.call = fn
 	return c
 }
@@ -34,7 +34,7 @@ func (c *Command) GetDesc() string {
 	return c.desc
 }
 
-func (c *Command) GetCall() func(*Runtime) {
+func (c *Command) GetCall() func(*App) {
 	return c.call
 }
 
