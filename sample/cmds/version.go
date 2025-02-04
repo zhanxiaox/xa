@@ -7,5 +7,5 @@ import (
 )
 
 func Version(app *xa.App) {
-	fmt.Println(app.GetVersion())
+	fmt.Println(app.GetAppInfo().Version)
 }

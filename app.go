@@ -63,24 +63,8 @@ func (a *App) GetArg(arg string) string {
 	return ""
 }
 
-func (a App) GetName() string {
-	return a.info.Name
-}
-
-func (a App) GetUsage() string {
-	return a.info.Usage
-}
-
-func (a App) GetDesc() string {
-	return a.info.Desc
-}
-
-func (a App) GetVersion() string {
-	return a.info.Version
-}
-
-func (a App) GetAuthor() string {
-	return a.info.Author
+func (a *App) GetAppInfo() AppInfo {
+	return a.info
 }
 
 func (a *App) Run() {
