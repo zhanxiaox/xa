@@ -12,6 +12,14 @@ type App struct {
 	runtime runtime
 }
 
+func New(ai AppInfo) *App {
+	return &App{
+		info:    ai,
+		cmds:    make(map[string]*Command),
+		runtime: runtime{},
+	}
+}
+
 type AppInfo struct {
 	Name              string
 	Desc              string
@@ -28,7 +36,7 @@ type runtime struct {
 	Args []string
 }
 
-func (a *App) SetRuntime() {
+func (a *App) setRuntime() {
 	a.runtime.Path = os.Args[0]
 	if len(os.Args) > 1 {
 		a.runtime.Cmd = os.Args[1]
@@ -40,15 +48,6 @@ func (a *App) SetRuntime() {
 
 func (a *App) GetRuntime() runtime {
 	return a.runtime
-}
-
-func New() *App {
-	return &App{cmds: make(map[string]*Command)}
-}
-
-func (a *App) Info(ai AppInfo) *App {
-	a.info = ai
-	return a
 }
 
 func (a *App) HasArg(arg string) bool {
@@ -68,9 +67,9 @@ func (a *App) GetAppInfo() AppInfo {
 }
 
 func (a *App) Run() {
-	a.SetRuntime()
+	a.setRuntime()
 	if a.info.EnableDefaultHelp {
-		a.NewCmd("help", defaultHelp).Desc("Print this default help information")
+		a.Cmd("help", defaultHelp).Desc("Print this default help information")
 	}
 	if cmd, ok := a.cmds[a.runtime.Cmd]; ok {
 		cmd.call(a)
@@ -81,7 +80,7 @@ func (a *App) Run() {
 	}
 }
 
-func (a *App) NewCmd(cmd string, call func(*App)) *Command {
+func (a *App) Cmd(cmd string, call func(*App)) *Command {
 	c := Command{name: cmd, call: call}
 	a.cmds[cmd] = &c
 	return &c
