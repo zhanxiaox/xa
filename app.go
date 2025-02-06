@@ -8,14 +8,14 @@ import (
 
 type App struct {
 	info    AppInfo
-	cmds    map[string]*Command
+	cmds    map[string]*command
 	runtime runtime
 }
 
-func New(ai AppInfo) *App {
+func New(info AppInfo) *App {
 	return &App{
-		info:    ai,
-		cmds:    make(map[string]*Command),
+		info:    info,
+		cmds:    make(map[string]*command),
 		runtime: runtime{},
 	}
 }
@@ -36,16 +36,6 @@ type runtime struct {
 	Args []string
 }
 
-func (a *App) setRuntime() {
-	a.runtime.Path = os.Args[0]
-	if len(os.Args) > 1 {
-		a.runtime.Cmd = os.Args[1]
-	}
-	if len(os.Args) > 2 {
-		a.runtime.Args = os.Args[2:]
-	}
-}
-
 func (a *App) GetRuntime() runtime {
 	return a.runtime
 }
@@ -57,7 +47,7 @@ func (a *App) HasArg(arg string) bool {
 func (a *App) GetArg(arg string) string {
 	index := slices.Index(a.runtime.Args, arg)
 	if index > 0 && len(os.Args) >= index+1 {
-		return os.Args[index+1]
+		return a.runtime.Args[index+1]
 	}
 	return ""
 }
@@ -67,7 +57,13 @@ func (a *App) GetAppInfo() AppInfo {
 }
 
 func (a *App) Run() {
-	a.setRuntime()
+	a.runtime.Path = os.Args[0]
+	if len(os.Args) > 1 {
+		a.runtime.Cmd = os.Args[1]
+	}
+	if len(os.Args) > 2 {
+		a.runtime.Args = os.Args[2:]
+	}
 	if a.info.EnableDefaultHelp {
 		a.Cmd("help", defaultHelp).Desc("Print this default help information")
 	}
@@ -76,14 +72,20 @@ func (a *App) Run() {
 	} else {
 		if a.info.EnableDefaultHelp {
 			defaultHelp(a)
+		} else {
+			fmt.Println("Unknown command:", a.runtime.Cmd)
 		}
 	}
 }
 
-func (a *App) Cmd(cmd string, call func(*App)) *Command {
-	c := Command{name: cmd, call: call}
-	a.cmds[cmd] = &c
-	return &c
+func (a *App) Cmd(name string, call func(*App)) (c *command) {
+	c = &command{Name: name, call: call}
+	a.cmds[name] = c
+	return
+}
+
+func (a *App) GetCmd(name string) command {
+	return *a.cmds[name]
 }
 
 func defaultHelp(a *App) {
@@ -95,9 +97,9 @@ func defaultHelp(a *App) {
 	fmt.Println()
 	fmt.Println("OPTIONS:")
 	for _, v := range a.cmds {
-		fmt.Printf("%-17s %v", v.name, v.desc)
-		for _, v := range v.args {
-			fmt.Printf("\n  %-15s %v", v.name, v.desc)
+		fmt.Printf("%-17s %v", v.Name, v.Description)
+		for _, v := range v.Argments {
+			fmt.Printf("\n  %-15s %v", v.Name, v.Description)
 		}
 		fmt.Println()
 	}
