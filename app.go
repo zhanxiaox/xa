@@ -22,7 +22,7 @@ func New(info AppInfo) *App {
 
 type AppInfo struct {
 	Name              string
-	Desc              string
+	Description       string
 	Author            string
 	Contact           string
 	Version           string
