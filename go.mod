@@ -1,3 +1,3 @@
-module e.coding.net/g-lmec8977/x/xa
+module gitee.com/zhanxiaox/xa
 
 go 1.23.2
