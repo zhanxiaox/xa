@@ -96,10 +96,10 @@ func defaultHelp(a *App) {
 	fmt.Println(a.info.Usage)
 	fmt.Println()
 	fmt.Println("OPTIONS:")
-	for _, v := range a.cmds {
-		fmt.Printf("%-17s %v", v.Name, v.Description)
-		for _, v := range v.Argments {
-			fmt.Printf("\n  %-15s %v", v.Name, v.Description)
+	for _, cmd := range a.cmds {
+		fmt.Printf("%-17s %v", cmd.Name, cmd.Description)
+		for _, argment := range cmd.Argments {
+			fmt.Printf("\n  %-15s %v", argment.Name, argment.Description)
 		}
 		fmt.Println()
 	}
