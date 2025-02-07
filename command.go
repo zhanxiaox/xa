@@ -1,23 +1,43 @@
 package xa
 
 type command struct {
-	Name        string
-	Description string
-	Argments    []args
+	name        string
+	description string
+	arguments   []argument
 	call        func(*App)
 }
 
-type args struct {
-	Name        string
-	Description string
+type argument struct {
+	name        string
+	description string
 }
 
 func (c *command) Desc(desc string) *command {
-	c.Description = desc
+	c.description = desc
 	return c
 }
 
 func (c *command) Args(name, desc string) *command {
-	c.Argments = append(c.Argments, args{Name: name, Description: desc})
+	c.arguments = append(c.arguments, argument{name: name, description: desc})
 	return c
+}
+
+func (c *command) GetName() string {
+	return c.name
+}
+
+func (c *command) GetDescription() string {
+	return c.description
+}
+
+func (c *command) GetArgments() []argument {
+	return c.arguments
+}
+
+func (a *argument) GetName() string {
+	return a.name
+}
+
+func (a *argument) GetDescription() string {
+	return a.description
 }
