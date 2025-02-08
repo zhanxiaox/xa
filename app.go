@@ -51,7 +51,7 @@ func (app *App) HasArgument(argument string) bool {
 
 func (app *App) GetArgument(argument string) string {
 	index := slices.Index(app.runtime.arguments, argument)
-	if index > 0 && len(os.Args) >= index+1 {
+	if index >= 0 && len(os.Args) >= index+1 {
 		return app.runtime.arguments[index+1]
 	}
 	return ""
