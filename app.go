@@ -57,6 +57,10 @@ func (app *App) GetArgument(argument string) string {
 	return ""
 }
 
+func (app *App) GetArgmentByIndex(index int) string {
+	return app.runtime.arguments[index]
+}
+
 func (app *App) Run() {
 	app.runtime.path = os.Args[0]
 	if len(os.Args) > 1 {
