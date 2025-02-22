@@ -9,7 +9,7 @@ import (
 
 type App struct {
 	meta     Meta
-	commands map[string]*Meta
+	commands []Meta
 }
 
 type Meta struct {
@@ -26,7 +26,7 @@ type Meta struct {
 func New(meta Meta) *App {
 	return &App{
 		meta:     meta,
-		commands: make(map[string]*Meta),
+		commands: []Meta{},
 	}
 }
 
@@ -35,22 +35,33 @@ func (app *App) Run() {
 		fmt.Println("No command specified")
 		return
 	}
-	if command, ok := app.commands[os.Args[1]]; ok {
-		command.Call(app)
-	} else {
-		fmt.Println("Unknown command:", os.Args[1])
+	for _, command := range app.commands {
+		if command.Name == os.Args[1] {
+			command.Call(app)
+			return
+		}
 	}
+	fmt.Println("Unknown command:", os.Args[1])
+}
+
+func (app *App) GetMeta() Meta {
+	return app.meta
 }
 
 func (app *App) Command(meta Meta) {
-	app.commands[meta.Name] = &meta
+	app.commands = append(app.commands, meta)
 }
 
 func getArgs() []string {
-	if len(os.Args) < 2 {
+	if len(os.Args) <= 2 {
 		return []string{}
 	}
 	return os.Args[2:]
+}
+
+func (app *App) HasArgs(name string) bool {
+	args := getArgs()
+	return slices.Contains(args, name)
 }
 
 func (app *App) GetArgsByIndex(index int) string {
@@ -64,7 +75,7 @@ func (app *App) GetArgsByIndex(index int) string {
 func (app *App) GetArgsByName(name string) string {
 	args := getArgs()
 	if index := slices.Index(args, name); index >= 0 {
-		if len(args)-1 > index+1 {
+		if len(args)-1 >= index+1 {
 			return args[index+1]
 		}
 	}
