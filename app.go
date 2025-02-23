@@ -19,7 +19,7 @@ type Meta struct {
 	Contact     string
 	Version     string
 	Usage       string
-	Call        func(*App)
+	Call        func(App)
 	Params      []Meta
 }
 
@@ -37,7 +37,7 @@ func (app *App) Run() {
 	}
 	for _, command := range app.commands {
 		if command.Name == os.Args[1] {
-			command.Call(app)
+			command.Call(*app)
 			return
 		}
 	}
@@ -93,7 +93,7 @@ func (app *App) GetArgsByEqual(name string) string {
 	return ""
 }
 
-func Help(app *App) {
+func Help(app App) {
 	fmt.Println(app.meta.Name, app.meta.Version)
 	fmt.Println(app.meta.Description)
 	fmt.Println()
