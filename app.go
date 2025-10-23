@@ -23,6 +23,9 @@ type Meta struct {
 	Params      []Meta
 }
 
+var userInputCmd string = ""
+var userInputArgs []string = []string{}
+
 func New(meta Meta) *App {
 	return &App{
 		meta:     meta,
@@ -35,56 +38,51 @@ func (app *App) Run() {
 		fmt.Println("No command specified")
 		return
 	}
+
+	userInputCmd = os.Args[1]
+	userInputArgs = os.Args[2:]
+
 	for _, command := range app.commands {
-		if command.Name == os.Args[1] {
+		if command.Name == userInputCmd {
 			command.Call(*app)
 			return
 		}
 	}
-	fmt.Println("Unknown command:", os.Args[1])
+
+	fmt.Println("Unknown command:", userInputCmd)
 }
 
 func (app *App) GetMeta() Meta {
 	return app.meta
 }
 
-func (app *App) Command(meta Meta) {
+func (app *App) Command(name string, meta Meta) {
+	meta.Name = name
 	app.commands = append(app.commands, meta)
 }
 
-func getArgs() []string {
-	if len(os.Args) <= 2 {
-		return []string{}
-	}
-	return os.Args[2:]
-}
-
 func (app *App) HasArgs(name string) bool {
-	args := getArgs()
-	return slices.Contains(args, name)
+	return slices.Contains(userInputArgs, name)
 }
 
 func (app *App) GetArgsByIndex(index int) string {
-	args := getArgs()
-	if len(args) > index {
-		return args[index]
+	if len(userInputArgs) > index {
+		return userInputArgs[index]
 	}
 	return ""
 }
 
 func (app *App) GetArgsByName(name string) string {
-	args := getArgs()
-	if index := slices.Index(args, name); index >= 0 {
-		if len(args)-1 >= index+1 {
-			return args[index+1]
+	if index := slices.Index(userInputArgs, name); index >= 0 {
+		if len(userInputArgs)-1 >= index+1 {
+			return userInputArgs[index+1]
 		}
 	}
 	return ""
 }
 
 func (app *App) GetArgsByEqual(name string) string {
-	args := getArgs()
-	for _, arg := range args {
+	for _, arg := range userInputArgs {
 		_arg := strings.Split(arg, "=")
 		if len(_arg) == 2 && _arg[0] == name {
 			return _arg[1]
