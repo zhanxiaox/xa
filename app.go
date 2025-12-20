@@ -9,7 +9,7 @@ import (
 
 type App struct {
 	meta     Meta
-	commands []Meta
+	commands []command
 }
 
 type Meta struct {
@@ -19,18 +19,25 @@ type Meta struct {
 	Contact     string
 	Version     string
 	Usage       string
-	Call        func(App)
 	Params      []Meta
+}
+
+type command struct {
+	Meta
+	Key  string
+	Call func(App)
 }
 
 var userInputCmd string = ""
 var userInputArgs []string = []string{}
 
-func New(meta Meta) *App {
-	return &App{
-		meta:     meta,
-		commands: []Meta{},
-	}
+func New() *App {
+	return &App{}
+}
+
+func (app *App) SetMeta(meta Meta) *App {
+	app.meta = meta
+	return app
 }
 
 func (app *App) Run() {
@@ -43,7 +50,7 @@ func (app *App) Run() {
 	userInputArgs = os.Args[2:]
 
 	for _, command := range app.commands {
-		if command.Name == userInputCmd {
+		if command.Key == userInputCmd {
 			command.Call(*app)
 			return
 		}
@@ -56,9 +63,16 @@ func (app *App) GetMeta() Meta {
 	return app.meta
 }
 
-func (app *App) Command(name string, meta Meta) {
-	meta.Name = name
-	app.commands = append(app.commands, meta)
+func (app *App) Command(key string, call func(App)) *command {
+	app.commands = append(app.commands, command{
+		Call: call,
+		Key:  key,
+	})
+	return &app.commands[len(app.commands)-1]
+}
+
+func (command *command) SetMeta(meta Meta) {
+	command.Meta = meta
 }
 
 func (app *App) HasArgs(name string) bool {
