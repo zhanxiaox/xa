@@ -28,9 +28,6 @@ type command struct {
 	Call func(App)
 }
 
-var userInputCmd string = ""
-var userInputArgs []string = []string{}
-
 func New() *App {
 	return &App{}
 }
@@ -39,6 +36,9 @@ func (app *App) SetMeta(meta Meta) *App {
 	app.meta = meta
 	return app
 }
+
+var userInputCmd string = ""
+var userInputArgs []string = []string{}
 
 func (app *App) Run() {
 	if len(os.Args) < 2 {
